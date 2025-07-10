@@ -11,7 +11,7 @@ export const Header: React.FC = () => {
         <div className="flex justify-between items-center h-12 sm:h-14 md:h-16">
           <Link to="/" className="flex items-center space-x-2">
   <img
-    src="/public/logo.png"
+    src="/logo.png"
     alt="HackMVP Logo"
     className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 animate-pulse"
   />
