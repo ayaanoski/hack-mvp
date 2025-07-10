@@ -74,21 +74,21 @@ export const CTASection: React.FC = () => {
         <footer className="text-center">
           <div className="flex justify-center space-x-4 sm:space-x-6 mb-4 sm:mb-6 md:mb-8">
             <a
-              href="#"
+              href="https://github.com/ayaanoski"
               className="text-gray-400 hover:text-purple-glow transition-colors"
               aria-label="GitHub"
             >
               <Github className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
             </a>
             <a
-              href="#"
+              href=""
               className="text-gray-400 hover:text-neon-blue transition-colors"
               aria-label="Twitter"
             >
               <Twitter className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
             </a>
             <a
-              href="#"
+              href="ayaanninja2403@gmail.com"
               className="text-gray-400 hover:text-neon-green transition-colors"
               aria-label="Email"
             >

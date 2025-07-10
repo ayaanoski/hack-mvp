@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lightbulb, MessageSquare, Presentation as PresentationChart, Layers, Palette, Rocket, Users, RotateCcw, FileText, BookOpen } from 'lucide-react';
+import { Lightbulb, MessageSquare, Presentation as PresentationChart, Layers, Palette,  RotateCcw, FileText, BookOpen } from 'lucide-react';
 
 const features = [
   {

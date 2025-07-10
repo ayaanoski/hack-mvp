@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Zap, History, CheckSquare } from 'lucide-react';
+import { History, CheckSquare } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const location = useLocation();
