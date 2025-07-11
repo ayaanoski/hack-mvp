@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, ArrowLeft, Download, ExternalLink, Loader2 } from 'lucide-react';
+import { Package, ArrowLeft, Download, ExternalLink, Loader2, ArrowRight } from 'lucide-react';
 import { apiService } from '../../services/api';
 import { projectStorage } from '../../utils/localStorage';
 import { WorkflowData } from './Dashboard';
@@ -24,50 +24,98 @@ export const MVPKit: React.FC<Props> = ({
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [mvpKit, setMvpKit] = useState(workflowData.mvpKit);
+  const [error, setError] = useState<string | null>(null);
 
   const generateMVPKit = async () => {
-    if (!workflowData.originalIdea || !workflowData.refinedDescription) return;
+    if (!workflowData.originalIdea || !workflowData.refinedDescription) {
+      setError('Please complete the previous steps first.');
+      return;
+    }
 
     setIsGenerating(true);
+    setError(null);
+    
     try {
+      console.log('Starting MVP Kit generation...');
       const kit = await apiService.generateMVPKit(workflowData.originalIdea, workflowData.refinedDescription);
+      console.log('MVP Kit generated successfully:', kit);
+      
       setMvpKit(kit);
       updateWorkflowData({ mvpKit: kit });
       
-      // Save to localStorage
-      projectStorage.add({
-        title: kit.title,
-        description: kit.description,
-        techStack: kit.techStack,
-        status: 'generated',
-      });
+      // Save to localStorage immediately
+      try {
+        projectStorage.add({
+          title: kit.title,
+          description: kit.description,
+          techStack: kit.techStack,
+          status: 'generated',
+        });
+        console.log('Project saved to localStorage');
+      } catch (storageError) {
+        console.warn('Failed to save to localStorage:', storageError);
+      }
+      
     } catch (error) {
       console.error('Error generating MVP kit:', error);
+      setError(error instanceof Error ? error.message : 'Failed to generate MVP kit. Please try again.');
     } finally {
       setIsGenerating(false);
     }
   };
 
+  // Auto-generate when component mounts if data is available but MVP kit is not generated
   useEffect(() => {
-    if (workflowData.refinedDescription && !mvpKit) {
+    if (workflowData.refinedDescription && !mvpKit && !isGenerating) {
+      console.log('Auto-generating MVP kit...');
       generateMVPKit();
     }
   }, [workflowData.refinedDescription]);
 
-  const handleDeploy = () => {
+  const handleDeploy = (e: React.MouseEvent) => {
+    e.preventDefault();
     alert('Deployment feature coming soon! Your MVP kit will be deployed to Vercel/Netlify.');
   };
 
-  const handleDownload = () => {
-    const dataStr = JSON.stringify(mvpKit, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  const handleDownload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!mvpKit) return;
     
-    const exportFileDefaultName = `${mvpKit.title.replace(/\s+/g, '-').toLowerCase()}-mvp-kit.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
+    try {
+      const dataStr = JSON.stringify(mvpKit, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `${mvpKit.title.replace(/\s+/g, '-').toLowerCase()}-mvp-kit.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Download failed. Please try again.');
+    }
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (mvpKit && canGoNext) {
+      console.log('Moving to next step with MVP kit:', mvpKit);
+      onNext();
+    }
+  };
+
+  const handlePrevious = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (canGoPrevious) {
+      onPrevious();
+    }
+  };
+
+  const handleRetry = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setError(null);
+    generateMVPKit();
   };
 
   return (
@@ -81,10 +129,25 @@ export const MVPKit: React.FC<Props> = ({
           Generate a complete MVP starter kit with code structure, documentation, and deployment configuration.
         </p>
 
+        {error && (
+          <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <p className="text-red-400 text-sm">{error}</p>
+              <button
+                onClick={handleRetry}
+                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        )}
+
         {isGenerating ? (
           <div className="text-center py-8 sm:py-12">
             <Loader2 className="h-8 w-8 sm:h-12 sm:w-12 animate-spin text-neon-green mx-auto mb-4" />
-            <p className="text-gray-300 text-sm sm:text-base">Generating your MVP kit...</p>
+            <p className="text-gray-300 text-sm sm:text-base mb-2">Generating your MVP kit...</p>
+            <p className="text-gray-500 text-xs sm:text-sm">This may take a few moments. Please don't refresh the page.</p>
           </div>
         ) : mvpKit ? (
           <div className="bg-dark-bg border border-dark-border rounded-lg p-4 sm:p-6 mb-6">
@@ -160,7 +223,15 @@ export const MVPKit: React.FC<Props> = ({
         ) : (
           <div className="text-center py-8 sm:py-12">
             <Package className="h-8 w-8 sm:h-12 sm:w-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400 text-sm sm:text-base">Complete the previous steps to generate your MVP kit.</p>
+            <p className="text-gray-400 text-sm sm:text-base mb-4">Complete the previous steps to generate your MVP kit.</p>
+            {workflowData.refinedDescription && (
+              <button
+                onClick={handleRetry}
+                className="px-4 py-2 bg-neon-green hover:bg-green-600 text-white rounded-lg transition-colors text-sm"
+              >
+                Generate MVP Kit
+              </button>
+            )}
           </div>
         )}
 
@@ -168,7 +239,7 @@ export const MVPKit: React.FC<Props> = ({
         <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
           {canGoPrevious && (
             <button
-              onClick={onPrevious}
+              onClick={handlePrevious}
               className="flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm sm:text-base"
             >
               <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
@@ -178,7 +249,7 @@ export const MVPKit: React.FC<Props> = ({
           
           {mvpKit && canGoNext && (
             <button
-              onClick={onNext}
+              onClick={handleNext}
               className="flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-neon-green hover:bg-green-600 text-white rounded-lg transition-colors ml-auto text-sm sm:text-base"
             >
               Next: Generate Checklist

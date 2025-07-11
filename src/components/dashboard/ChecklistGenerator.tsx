@@ -18,7 +18,6 @@ export const ChecklistGenerator: React.FC<Props> = ({
   updateWorkflowData, 
   onPrevious, 
   canGoPrevious,
-  goToStep
 }) => {
   const [checklist, setChecklist] = useState(workflowData.checklist);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -59,10 +58,11 @@ export const ChecklistGenerator: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    if (workflowData.refinedDescription && !checklist) {
+    if (workflowData.refinedDescription && workflowData.mvpKit && !checklist && !isGenerating) {
+      console.log('Auto-generating checklist...');
       generateChecklist();
     }
-  }, [workflowData.refinedDescription]);
+  }, [workflowData.refinedDescription, workflowData.mvpKit]);
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-0">

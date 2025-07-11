@@ -95,7 +95,7 @@ class ApiService {
     const messages: ApiMessage[] = [
       {
         role: 'system',
-        content: 'You are an expert MVP generator. Generate a comprehensive MVP kit with detailed title, description, tech stack, features, timeline, code structure, and deployment configuration. Provide extensive details and practical implementation guidance.'
+        content: 'You are an expert MVP generator. Generate a comprehensive MVP kit with detailed title, description, tech stack, features, timeline, code structure, and deployment configuration. Provide extensive details and practical implementation guidance. Be thorough and detailed in your response.'
       },
       {
         role: 'user',
@@ -103,27 +103,60 @@ class ApiService {
       }
     ];
 
-    const response = await this.sendMessage(messages);
-    
-    // Parse the response to extract structured data
-    // In a real implementation, you might want to use a more sophisticated parsing method
-    return {
-      title: `${idea} - MVP Kit`,
-      description: refinedDescription,
-      techStack: ['React', 'TypeScript', 'Node.js', 'MongoDB', 'Tailwind CSS', 'Vercel'],
-      features: [
+    try {
+      const response = await this.sendMessage(messages);
+      
+      // Parse the response to extract structured data
+      const content = response.reply.content;
+      
+      // Extract tech stack from the response
+      const techStackMatch = content.match(/(?:tech stack|technologies|stack)[\s\S]*?(?:\n\n|\n(?=[A-Z]))/i);
+      let techStack = ['React', 'TypeScript', 'Node.js', 'MongoDB', 'Tailwind CSS', 'Vercel'];
+      
+      if (techStackMatch) {
+        const techText = techStackMatch[0];
+        const techs = techText.match(/(?:React|Vue|Angular|Node\.js|Express|MongoDB|PostgreSQL|MySQL|TypeScript|JavaScript|Python|Django|Flask|Tailwind|Bootstrap|CSS|HTML|Vercel|Netlify|AWS|Docker|Redis|GraphQL|REST|API)/gi);
+        if (techs && techs.length > 0) {
+          techStack = [...new Set(techs)]; // Remove duplicates
+        }
+      }
+      
+      // Extract features from the response
+      const featuresMatch = content.match(/(?:features|functionality|capabilities)[\s\S]*?(?:\n\n|\n(?=[A-Z]))/i);
+      let features = [
         'User authentication and authorization',
         'Core feature implementation',
         'Responsive design',
         'API integration',
         'Database setup',
         'Deployment configuration',
-      ],
-      timeline: '2-3 days for full implementation',
-      codeStructure: response.reply.content,
-      deploymentConfig: 'Vercel deployment with environment variables configured',
-    };
+      ];
+      
+      if (featuresMatch) {
+        const featureText = featuresMatch[0];
+        const featureLines = featureText.split('\n').filter(line => 
+          line.trim().match(/^[-*•]\s+/) || line.trim().match(/^\d+\.\s+/)
+        );
+        if (featureLines.length > 0) {
+          features = featureLines.map(line => line.replace(/^[-*•]\s+|\d+\.\s+/, '').trim()).filter(f => f.length > 0);
+        }
+      }
+      
+      return {
+        title: `${idea} - MVP Kit`,
+        description: refinedDescription,
+        techStack,
+        features,
+        timeline: '2-3 days for full implementation',
+        codeStructure: content,
+        deploymentConfig: 'Vercel deployment with environment variables configured',
+      };
+    } catch (error) {
+      console.error('Error in generateMVPKit:', error);
+      throw new Error(`Failed to generate MVP kit: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
+    
 
   async generatePitchDeck(idea: string, refinedDescription: string): Promise<PitchDeck> {
     const messages: ApiMessage[] = [

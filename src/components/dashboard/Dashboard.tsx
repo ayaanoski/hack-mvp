@@ -28,14 +28,25 @@ const steps = [
 
 export const Dashboard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [workflowData, setWorkflowData] = useState<WorkflowData>({
-    originalIdea: '',
-    refinedDescription: '',
-    generatedPrompt: '',
-    pitchDeck: null,
-    videoScript: null,
-    mvpKit: null,
-    checklist: null,
+  const [workflowData, setWorkflowData] = useState<WorkflowData>(() => {
+    // Try to restore from localStorage on initial load
+    try {
+      const saved = localStorage.getItem('hackmvp_current_workflow');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.warn('Failed to restore workflow data:', error);
+    }
+    return {
+      originalIdea: '',
+      refinedDescription: '',
+      generatedPrompt: '',
+      pitchDeck: null,
+      videoScript: null,
+      mvpKit: null,
+      checklist: null,
+    };
   });
 
   const ActiveComponent = steps[currentStep].component;
@@ -53,7 +64,16 @@ export const Dashboard: React.FC = () => {
   };
 
   const updateWorkflowData = (data: Partial<WorkflowData>) => {
-    setWorkflowData(prev => ({ ...prev, ...data }));
+    setWorkflowData(prev => {
+      const newData = { ...prev, ...data };
+      // Save to localStorage immediately
+      try {
+        localStorage.setItem('hackmvp_current_workflow', JSON.stringify(newData));
+      } catch (error) {
+        console.warn('Failed to save workflow data:', error);
+      }
+      return newData;
+    });
   };
 
   const goToStep = (stepIndex: number) => {

@@ -122,7 +122,7 @@ export const IdeaRefiner: React.FC<Props> = ({ workflowData, updateWorkflowData,
             value={idea}
             onChange={(e) => setIdea(e.target.value)}
             placeholder="Describe your hackathon idea..."
-            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-dark-bg border border-dark-border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-neon-purple text-sm sm:text-base"
+            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-dark-border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-neon-purple text-sm sm:text-base"
           />
           <button
             type="submit"
