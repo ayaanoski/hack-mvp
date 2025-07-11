@@ -22,6 +22,12 @@ export default {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce 3s infinite',
         'spin-slow': 'spin 8s linear infinite',
+        'move-diagonal-1': 'moveDiagonal1 15s linear infinite',
+        'move-diagonal-2': 'moveDiagonal2 20s linear infinite',
+        'move-diagonal-3': 'moveDiagonal3 18s linear infinite',
+        'move-horizontal-1': 'moveHorizontal1 25s linear infinite',
+        'move-horizontal-2': 'moveHorizontal2 30s linear infinite',
+        'move-vertical-1': 'moveVertical1 22s linear infinite',
       },
       keyframes: {
         glow: {
@@ -31,6 +37,30 @@ export default {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        moveDiagonal1: {
+          '0%': { transform: 'translate(-100px, 100px)' },
+          '100%': { transform: 'translate(calc(100vw + 100px), calc(-100vh - 100px))' },
+        },
+        moveDiagonal2: {
+          '0%': { transform: 'translate(100px, -100px)' },
+          '100%': { transform: 'translate(calc(-100vw - 100px), calc(100vh + 100px))' },
+        },
+        moveDiagonal3: {
+          '0%': { transform: 'translate(50px, -50px)' },
+          '100%': { transform: 'translate(calc(-100vw - 50px), calc(100vh + 50px))' },
+        },
+        moveHorizontal1: {
+          '0%': { transform: 'translateX(-100vw)' },
+          '100%': { transform: 'translateX(100vw)' },
+        },
+        moveHorizontal2: {
+          '0%': { transform: 'translateX(100vw)' },
+          '100%': { transform: 'translateX(-100vw)' },
+        },
+        moveVertical1: {
+          '0%': { transform: 'translateY(-100vh)' },
+          '100%': { transform: 'translateY(100vh)' },
         },
       },
     },
