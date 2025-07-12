@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Mail, Github, Twitter } from 'lucide-react';
+import {  useNavigate } from 'react-router-dom';
+import { ArrowRight} from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const CTASection: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,6 +15,14 @@ export const CTASection: React.FC = () => {
     console.log('Subscribed:', email);
     setIsSubscribed(true);
     setEmail('');
+  };
+
+  const handleStartBuilding = () => {
+    if (currentUser) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
+    }
   };
 
   return (
@@ -28,13 +39,13 @@ export const CTASection: React.FC = () => {
             Join thousands of developers who are already using HackMVP to win hackathons and build amazing products.
           </p>
           
-          <Link
-            to="/dashboard"
+          <button
+            onClick={handleStartBuilding}
             className="inline-flex items-center px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 bg-gradient-to-r from-purple-glow to-neon-blue hover:from-purple-600 hover:to-blue-600 text-white text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 transform hover:scale-105 animate-glow"
           >
-            Start Building Now
+            {currentUser ? 'Continue Building' : 'Start Building Now'}
             <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-          </Link>
+          </button>
         </div>
 
         {/* Newsletter Signup */}
@@ -70,39 +81,7 @@ export const CTASection: React.FC = () => {
           )}
         </div>
 
-        {/* Footer */}
-        <footer className="text-center">
-          <div className="flex justify-center space-x-4 sm:space-x-6 mb-4 sm:mb-6 md:mb-8">
-            <a
-              href="https://github.com/ayaanoski"
-              className="text-gray-400 hover:text-purple-glow transition-colors"
-              aria-label="GitHub"
-            >
-              <Github className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
-            </a>
-            <a
-              href=""
-              className="text-gray-400 hover:text-neon-blue transition-colors"
-              aria-label="Twitter"
-            >
-              <Twitter className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
-            </a>
-            <a
-              href="ayaanninja2403@gmail.com"
-              className="text-gray-400 hover:text-neon-green transition-colors"
-              aria-label="Email"
-            >
-              <Mail className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
-            </a>
-          </div>
-          
-          <div className="text-gray-400 text-xs sm:text-sm md:text-base">
-            <p>&copy; 2024 HackMVP. All rights reserved.</p>
-            <p className="mt-1 sm:mt-2">
-              Built with ❤️ for the hackathon community
-            </p>
-          </div>
-        </footer>
+      
       </div>
     </section>
   );

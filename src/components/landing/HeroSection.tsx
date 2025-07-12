@@ -1,8 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles, Zap } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const HeroSection: React.FC = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleTryHackMVP = () => {
+    if (currentUser) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 pt-12 sm:pt-14 md:pt-16">
@@ -12,11 +24,9 @@ export const HeroSection: React.FC = () => {
             <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
             <span className="text-xs sm:text-sm">AI-Powered Hackathon Tool</span>
           </div>
-          
 
           {/* Main Headline */}
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-3 sm:mb-4 md:mb-6">
-            
             <span className="bg-gradient-to-r from-purple-glow via-neon-blue to-neon-green bg-clip-text text-transparent">
               HackMVP
             </span>
@@ -34,19 +44,19 @@ export const HeroSection: React.FC = () => {
           </p>
 
           {/* CTA Button */}
-          <Link
-            to="/dashboard"
+          <button
+            onClick={handleTryHackMVP}
             className="inline-flex items-center px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 bg-gradient-to-r from-purple-glow to-neon-blue hover:from-purple-600 hover:to-blue-600 text-white text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 transform hover:scale-105 animate-glow"
           >
-            Try HackMVP
+            {currentUser ? 'Go to Dashboard' : 'Try HackMVP'}
             <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-          </Link>
+          </button>
 
           {/* Stats */}
           <div className="mt-8 sm:mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
             {[
               { icon: Zap, value: '10x', label: 'Faster Creation' },
-              { icon: Sparkles, value: '#1', label: 'All In One' },
+              { icon: Sparkles, value: '500+', label: 'Hackathon Teams' },
               { icon: ArrowRight, value: '95%', label: 'Success Rate' },
             ].map((stat, index) => (
               <div key={index} className="text-center">
