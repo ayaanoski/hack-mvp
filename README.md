@@ -5,6 +5,13 @@
 
 **HackMVP** is an AI-powered hackathon co-pilot that transforms rough ideas into fully functional MVPs in minutes. Built with cutting-edge AI agents powered by **IO Intelligence's Llama-3.3-70B-Instruct** model, HackMVP provides a comprehensive toolkit for hackathon success.
 
+## SNAPSHOTS:
+<img width="1854" height="910" alt="image" src="https://github.com/user-attachments/assets/3d7c65d1-332b-4a6a-b870-5df97fb289f5" />
+
+<img width="1858" height="920" alt="image" src="https://github.com/user-attachments/assets/1b2f4a77-3608-46a4-a72d-e6b0af72fa38" />
+
+<img width="1851" height="916" alt="image" src="https://github.com/user-attachments/assets/1c03cbca-722b-4a55-8c3c-204ffb2dd407" />
+
 ### ✨ Key Features
 
 - 🧠 **AI Idea Refinement** - Transform vague concepts into actionable project plans
