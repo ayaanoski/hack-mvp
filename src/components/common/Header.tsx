@@ -44,7 +44,11 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-12 sm:h-14 md:h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <Zap className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-purple-glow animate-pulse" />
+            <img
+    src="/logo.png"
+    alt="HackMVP Logo"
+    className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 animate-pulse"
+  />
             <span className="text-sm sm:text-lg md:text-xl font-bold text-white">HackMVP</span>
           </Link>
 
