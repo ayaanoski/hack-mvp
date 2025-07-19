@@ -14,14 +14,16 @@
 
 ### ✨ Key Features
 
-- 🧠 **AI Idea Refinement** - Transform vague concepts into actionable project plans
-- 🔧 **Smart Prompt Generation** - Create optimized prompts for development tools
-- 📊 **Pitch Deck Creation** - Generate compelling presentations automatically
-- 🎬 **Video Script Generation** - Create engaging demo video scripts
-- 📦 **MVP Kit Builder** - Complete project structure with tech stack recommendations
-- ✅ **Project Checklists** - Comprehensive task management for hackathon success
-- 📱 **Mobile-First Design** - Fully responsive across all devices
-- 🌙 **Dark Theme** - Beautiful dark interface with animated backgrounds
+- 🧠 AI Idea Refinement - Transform vague concepts into actionable project plans
+- 🔧 Smart Prompt Generation - Create optimized prompts for development tools
+- 📊 Pitch Deck Creation - Generate compelling presentations automatically
+- 🎬 Video Script Generation - Create engaging demo video scripts
+- 📦 MVP Kit Builder - Complete project structure with tech stack recommendations
+- ✅ Project Checklists - Comprehensive task management for hackathon success
+- 🧱 Component Generator - Generate UI components from natural language prompts
+- 🧪 Test Case Generator - Instantly create unit, integration, and E2E test cases
+- 📱 Mobile-First Design - Fully responsive across all devices
+- 🌙 Dark Theme - Beautiful dark interface with animated backgrounds
 
 ## 🤖 IO Intelligence Integration
 
@@ -89,6 +91,23 @@ Each step in the HackMVP workflow is powered by a specialized AI agent with cust
   content: 'You are an expert project manager for hackathons. Generate comprehensive project checklists with categorized tasks, timelines, and milestones.'
 }
 ```
+
+#### 7. **Component Generator Agent**
+```typescript
+{
+  role: 'system',
+  content: 'You are a UI component generator. Given a user prompt, generate React components using TailwindCSS (or Chakra UI, React Native, or Flutter if specified). Provide production-ready, responsive, and clean code.'
+}
+```
+
+#### 8. **Test Case Generator Agent**
+```typescript
+{
+  role: 'system',
+  content: 'You are an expert software test engineer. Given source code, generate relevant unit tests (e.g., Jest, Mocha), integration tests (e.g., Playwright/Cypress), or API tests with appropriate structure and mock data.'
+}
+```
+
 
 ### API Communication Flow
 
@@ -243,6 +262,19 @@ npm run build
 - Progress tracking with completion status
 - Exportable checklist format
 
+#### 7. Component Generator 🧱
+- User provides a UI description (e.g., "a sidebar with filters for size, price, and color")
+- AI agent generates production-ready React components using TailwindCSS
+- Supports Chakra UI, React Native, and Flutter options
+- Exports reusable code blocks ready for development
+
+#### 8. Test Case Generator 🧪
+### Paste source code or describe functionality
+- AI auto-generates:
+- Unit tests (e.g., using Jest)
+- Integration tests (e.g., Playwright, Cypress)
+- E2E tests with mocked API and assertions
+- Provides ready-to-run test files and structure suggestions
 
 ## 🚀 Deployment
 
