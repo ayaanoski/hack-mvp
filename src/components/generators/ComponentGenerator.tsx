@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Code, Download, Eye, Copy, Check, Loader2, Play } from 'lucide-react';
+import { Code, Download, Eye, Copy, Check, Loader2} from 'lucide-react';
 import { apiService } from '../../services/api';
 import { generatorStorage } from '../../utils/localStorage';
 import { MarkdownRenderer } from '../common/MarkdownRenderer';

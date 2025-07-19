@@ -72,29 +72,56 @@ class ApiService {
   private baseURL: string;
 
   constructor() {
-    // It's recommended to use a more secure way to handle API keys in a real-world application.
     this.apiKey = typeof import.meta.env.VITE_IO_API_KEY === 'string' ? import.meta.env.VITE_IO_API_KEY : '';
     this.modelName = typeof import.meta.env.VITE_IO_MODEL_NAME === 'string' ? import.meta.env.VITE_IO_MODEL_NAME : 'meta-llama/Llama-3.3-70B-Instruct';
     this.baseURL = 'https://api.intelligence.io.solutions/api/v1/';
   }
 
   /**
-   * Extracts and parses a JSON object from a string.
-   * Handles cases where the JSON is embedded in a markdown code block.
+   * Extracts and parses a JSON object from a string, with fallbacks for common AI errors.
    * @param text The string containing the JSON.
-   * @returns A parsed object of type T or null if parsing fails.
+   * @returns A parsed object of type T.
+   * @throws An error if parsing fails definitively.
    */
-  private extractAndParseJson<T>(text: string): T | null {
-    // Find a JSON code block, or assume the whole string is JSON.
-    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]+?)\s*```/);
-    const potentialJson = jsonMatch ? jsonMatch[1] : text;
+  private extractAndParseJson<T>(text: string): T {
+    // 1. Find the JSON object within the string using a robust regex.
+    // This looks for content between the first '{' and the last '}'
+    const match = text.match(/{[\s\S]*}/);
 
+    if (!match) {
+      throw new Error("Could not find a valid JSON object in the AI response.");
+    }
+
+    let jsonString = match[0];
+
+    // 2. Attempt to parse the extracted JSON string.
     try {
-      return JSON.parse(potentialJson) as T;
-    } catch (error) {
-      console.error("Failed to parse JSON from AI response:", error);
-      console.error("Raw response content:", text);
-      return null;
+      return JSON.parse(jsonString) as T;
+    } catch (initialError) {
+      console.warn("Initial JSON.parse failed. Attempting to repair common syntax errors.", initialError);
+      
+      // 3. If it fails, attempt to fix common issues like backticked multi-line strings.
+      // The BEST long-term solution is to refine the AI's prompt.
+      try {
+        // This regex finds keys followed by a backticked string (`...`) and replaces it
+        // with a properly formatted, double-quoted JSON string.
+        const correctedString = jsonString.replace(/:[ \t]*`([\s\S]*?)`/g, (_match, content) => {
+          // Escape special characters for a valid JSON string
+          const escapedContent = content
+            .replace(/\\/g, '\\\\')  // Must escape backslashes first
+            .replace(/"/g, '\\"')   // Escape double quotes
+            .replace(/\n/g, '\\n');  // Replace newlines with \n
+          return `: "${escapedContent.trim()}"`; // Return as a valid JSON string value
+        });
+        
+        console.log("Attempting to parse the repaired string.");
+        return JSON.parse(correctedString) as T;
+
+      } catch (finalError) {
+        console.error("Could not parse JSON even after attempting repairs.", finalError);
+        console.error("String that failed final parsing attempt:", jsonString);
+        throw new Error("Failed to parse the AI response. The JSON structure is malformed beyond simple repairs.");
+      }
     }
   }
 
@@ -126,7 +153,7 @@ class ApiService {
           model: this.modelName,
           messages: finalMessages,
           temperature: 0.5,
-          max_tokens: 4096, // Increased token limit for larger JSON objects
+          max_tokens: 4096,
         }),
       });
 
@@ -155,7 +182,7 @@ class ApiService {
     const messages: ApiMessage[] = [
       {
         role: 'system',
-        content: `You are an expert MVP generator. Your task is to generate a comprehensive MVP kit. Respond with a single, valid JSON object that conforms to the MVPKit interface. Do not include any text, markdown, or explanation outside of the JSON object.
+        content: `You are an expert MVP generator. Your task is to generate a comprehensive MVP kit. Respond with a single, valid JSON object that conforms to the MVPKit interface. Do not include any text, markdown, or explanation outside of the JSON object. For any string value that contains multiple lines (like 'codeStructure'), ensure it is a valid JSON string with escaped newlines (\\n).
         
         The JSON structure should be:
         {
@@ -164,7 +191,7 @@ class ApiService {
           "techStack": ["Technology1", "Technology2", "Framework3", "Database4"],
           "features": ["Detailed feature 1 description.", "Detailed feature 2 description.", "User authentication (JWT)."],
           "timeline": "A realistic timeline for the MVP, e.g., '48-hour hackathon: Day 1 - Backend & Core Logic, Day 2 - Frontend & Deployment'.",
-          "codeStructure": "A detailed ASCII representation of the project's directory structure (e.g., /src, /components, /api).",
+          "codeStructure": "A detailed ASCII representation of the project's directory structure (e.g., /src\\n  /components\\n  /api).",
           "deploymentConfig": "Detailed steps for deployment on a platform like Vercel, Netlify, or AWS Amplify, including environment variables."
         }`
       },
@@ -176,14 +203,8 @@ class ApiService {
 
     try {
       const response = await this.sendMessage(messages);
-      const mvpKit = this.extractAndParseJson<MVPKit>(response.reply.content);
-
-      if (mvpKit) {
-        return mvpKit;
-      } else {
-        // Fallback if JSON parsing fails
-        throw new Error("Failed to parse MVP Kit from AI response. The response was not valid JSON.");
-      }
+      // The new parser will throw an error on failure, which is caught below.
+      return this.extractAndParseJson<MVPKit>(response.reply.content);
     } catch (error) {
       console.error('Error in generateMVPKit:', error);
       throw new Error(`Failed to generate MVP kit: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -198,39 +219,34 @@ class ApiService {
    */
   async generatePitchDeck(idea: string, refinedDescription: string): Promise<PitchDeck> {
     const messages: ApiMessage[] = [
-      {
-        role: 'system',
-        content: `You are an expert pitch deck creator for hackathons. Generate comprehensive pitch deck content as a single, valid JSON object that conforms to the PitchDeck interface. Do not include any explanatory text outside the JSON object.
-
-        JSON structure:
         {
-          "overview": "A compelling overview of the pitch deck's narrative.",
-          "slides": [
-            { "title": "Problem", "description": "Clearly define the core problem you're solving with compelling data or a relatable story." },
-            { "title": "Solution", "description": "Present your innovative solution and how it directly addresses the problem." },
-            { "title": "Live Demo", "description": "Outline the key features to be shown in the live demo." },
-            { "title": "Tech Stack", "description": "Briefly showcase the technical implementation and why the chosen stack is effective." },
-            { "title": "Market & Business Model", "description": "Highlight the market potential and a plausible monetization strategy." },
-            { "title": "Team & Next Steps", "description": "Introduce the team and outline future development plans post-hackathon." }
-          ],
-          "content": "A concise, full-text version of the presentation script.",
-          "tips": "Actionable tips for delivering this specific presentation with impact."
-        }`
-      },
-      {
-        role: 'user',
-        content: `Create a detailed pitch deck in the specified JSON format for this hackathon project: "${idea}"\n\nProject details: "${refinedDescription}"`
-      }
+            role: 'system',
+            content: `You are an expert pitch deck creator for hackathons. Generate comprehensive pitch deck content as a single, valid JSON object that conforms to the PitchDeck interface. Do not include any explanatory text outside the JSON object.
+
+            JSON structure:
+            {
+              "overview": "A compelling overview of the pitch deck's narrative.",
+              "slides": [
+                { "title": "Problem", "description": "Clearly define the core problem you're solving with compelling data or a relatable story." },
+                { "title": "Solution", "description": "Present your innovative solution and how it directly addresses the problem." },
+                { "title": "Live Demo", "description": "Outline the key features to be shown in the live demo." },
+                { "title": "Tech Stack", "description": "Briefly showcase the technical implementation and why the chosen stack is effective." },
+                { "title": "Market & Business Model", "description": "Highlight the market potential and a plausible monetization strategy." },
+                { "title": "Team & Next Steps", "description": "Introduce the team and outline future development plans post-hackathon." }
+              ],
+              "content": "A concise, full-text version of the presentation script.",
+              "tips": "Actionable tips for delivering this specific presentation with impact."
+            }`
+        },
+        {
+            role: 'user',
+            content: `Create a detailed pitch deck in the specified JSON format for this hackathon project: "${idea}"\n\nProject details: "${refinedDescription}"`
+        }
     ];
 
     try {
         const response = await this.sendMessage(messages);
-        const pitchDeck = this.extractAndParseJson<PitchDeck>(response.reply.content);
-        if (pitchDeck) {
-            return pitchDeck;
-        } else {
-            throw new Error("Failed to parse Pitch Deck from AI response. The response was not valid JSON.");
-        }
+        return this.extractAndParseJson<PitchDeck>(response.reply.content);
     } catch (error) {
         console.error('Error in generatePitchDeck:', error);
         throw new Error(`Failed to generate pitch deck: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -245,36 +261,31 @@ class ApiService {
    */
   async generateVideoScript(idea: string, refinedDescription: string): Promise<VideoScript> {
     const messages: ApiMessage[] = [
-      {
-        role: 'system',
-        content: `You are an expert video script writer for product demos. Create an engaging script as a single, valid JSON object that conforms to the VideoScript interface. No text outside the JSON.
-
-        JSON structure:
         {
-          "duration": "Total estimated duration (e.g., '90 seconds').",
-          "style": "Visual and narrative style (e.g., 'Fast-paced tech demo with animated overlays').",
-          "target": "Target audience (e.g., 'Hackathon judges and potential users').",
-          "productionNotes": "Key production notes (e.g., 'Use screen recordings with high-energy background music.').",
-          "scenes": [
-            { "title": "Hook", "description": "Voice-over to grab attention.", "duration": "15s", "visual": "Description of on-screen visuals." }
-          ],
-          "fullScript": "A concatenation of all scene descriptions for a readable script."
-        }`
-      },
-      {
-        role: 'user',
-        content: `Create a detailed video script in the specified JSON format for this project: "${idea}"\n\nProject details: "${refinedDescription}"`
-      }
+            role: 'system',
+            content: `You are an expert video script writer for product demos. Create an engaging script as a single, valid JSON object that conforms to the VideoScript interface. No text outside the JSON.
+
+            JSON structure:
+            {
+              "duration": "Total estimated duration (e.g., '90 seconds').",
+              "style": "Visual and narrative style (e.g., 'Fast-paced tech demo with animated overlays').",
+              "target": "Target audience (e.g., 'Hackathon judges and potential users').",
+              "productionNotes": "Key production notes (e.g., 'Use screen recordings with high-energy background music.').",
+              "scenes": [
+                { "title": "Hook", "description": "Voice-over to grab attention.", "duration": "15s", "visual": "Description of on-screen visuals." }
+              ],
+              "fullScript": "A concatenation of all scene descriptions for a readable script."
+            }`
+        },
+        {
+            role: 'user',
+            content: `Create a detailed video script in the specified JSON format for this project: "${idea}"\n\nProject details: "${refinedDescription}"`
+        }
     ];
 
     try {
         const response = await this.sendMessage(messages);
-        const videoScript = this.extractAndParseJson<VideoScript>(response.reply.content);
-        if(videoScript) {
-            return videoScript;
-        } else {
-            throw new Error("Failed to parse Video Script from AI response. The response was not valid JSON.");
-        }
+        return this.extractAndParseJson<VideoScript>(response.reply.content);
     } catch (error) {
         console.error('Error in generateVideoScript:', error);
         throw new Error(`Failed to generate video script: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -288,38 +299,33 @@ class ApiService {
    */
   async generateChecklist(workflowData: { originalIdea: string, refinedDescription: string }): Promise<ProjectChecklist> {
     const messages: ApiMessage[] = [
-      {
-        role: 'system',
-        content: `You are an expert project manager for hackathons. Generate a comprehensive project checklist as a single, valid JSON object conforming to the ProjectChecklist interface. No text outside the JSON.
-
-        JSON structure:
         {
-          "overview": "A brief overview of the project plan.",
-          "categories": [
+            role: 'system',
+            content: `You are an expert project manager for hackathons. Generate a comprehensive project checklist as a single, valid JSON object conforming to the ProjectChecklist interface. No text outside the JSON.
+
+            JSON structure:
             {
-              "name": "Category (e.g., Planning, Backend, Frontend, Deployment)",
-              "items": [
-                { "task": "Specific task.", "description": "Brief description of the task.", "completed": false }
-              ]
-            }
-          ],
-          "timeline": "Summary of the project timeline and key milestones."
-        }`
-      },
-      {
-        role: 'user',
-        content: `Create a detailed project checklist in the specified JSON format for this hackathon project: "${workflowData.originalIdea}"\n\nProject details: "${workflowData.refinedDescription}"`
-      }
+              "overview": "A brief overview of the project plan.",
+              "categories": [
+                {
+                  "name": "Category (e.g., Planning, Backend, Frontend, Deployment)",
+                  "items": [
+                    { "task": "Specific task.", "description": "Brief description of the task.", "completed": false }
+                  ]
+                }
+              ],
+              "timeline": "Summary of the project timeline and key milestones."
+            }`
+        },
+        {
+            role: 'user',
+            content: `Create a detailed project checklist in the specified JSON format for this hackathon project: "${workflowData.originalIdea}"\n\nProject details: "${workflowData.refinedDescription}"`
+        }
     ];
 
     try {
         const response = await this.sendMessage(messages);
-        const projectChecklist = this.extractAndParseJson<ProjectChecklist>(response.reply.content);
-        if (projectChecklist) {
-            return projectChecklist;
-        } else {
-            throw new Error("Failed to parse Project Checklist from AI response. The response was not valid JSON.");
-        }
+        return this.extractAndParseJson<ProjectChecklist>(response.reply.content);
     } catch (error) {
         console.error('Error in generateChecklist:', error);
         throw new Error(`Failed to generate project checklist: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -334,14 +340,14 @@ class ApiService {
    */
   async generatePrompt(projectType: string, requirements: string): Promise<string> {
     const messages: ApiMessage[] = [
-      {
-        role: 'system',
-        content: 'You are an expert prompt engineer. Generate detailed, optimized prompts for development tools and AI assistants based on project requirements. Include specific technical details, constraints, and desired outcomes.'
-      },
-      {
-        role: 'user',
-        content: `Generate a detailed and optimized prompt for a ${projectType} project with these requirements: ${requirements}\n\nCreate a comprehensive prompt that includes technical specifications, design requirements, functionality details, and any specific constraints or preferences.`
-      }
+        {
+            role: 'system',
+            content: 'You are an expert prompt engineer. Generate detailed, optimized prompts for development tools and AI assistants based on project requirements. Include specific technical details, constraints, and desired outcomes.'
+        },
+        {
+            role: 'user',
+            content: `Generate a detailed and optimized prompt for a ${projectType} project with these requirements: ${requirements}\n\nCreate a comprehensive prompt that includes technical specifications, design requirements, functionality details, and any specific constraints or preferences.`
+        }
     ];
 
     const response = await this.sendMessage(messages);
@@ -356,32 +362,32 @@ class ApiService {
    */
   async generateComponent(description: string, framework: string): Promise<string> {
     const frameworkPrompts = {
-      'react-tailwind': 'React with TailwindCSS',
-      'chakra-ui': 'React with Chakra UI',
-      'flutter': 'Flutter Widget',
-      'react-native': 'React Native Component'
+        'react-tailwind': 'React with TailwindCSS',
+        'chakra-ui': 'React with Chakra UI',
+        'flutter': 'Flutter Widget',
+        'react-native': 'React Native Component'
     };
 
     const frameworkName = frameworkPrompts[framework as keyof typeof frameworkPrompts] || frameworkPrompts['react-tailwind'];
 
     const messages: ApiMessage[] = [
-      {
-        role: 'system',
-        content: `You are an expert frontend developer specializing in ${frameworkName}. Your task is to generate a single file component. The code should be clean, production-ready, responsive, and accessible. Provide only the raw code, including all necessary imports and exports. Do not wrap it in markdown blocks or add any explanations.`
-      },
-      {
-        role: 'user',
-        content: `Create a ${frameworkName} component for: "${description}". Ensure it is a complete, self-contained, and functional piece of code.`
-      }
+        {
+            role: 'system',
+            content: `You are an expert frontend developer specializing in ${frameworkName}. Your task is to generate a single file component. The code should be clean, production-ready, responsive, and accessible. Provide only the raw code, including all necessary imports and exports. Do not wrap it in markdown blocks or add any explanations.`
+        },
+        {
+            role: 'user',
+            content: `Create a ${frameworkName} component for: "${description}". Ensure it is a complete, self-contained, and functional piece of code.`
+        }
     ];
 
     try {
-      const response = await this.sendMessage(messages);
-      // Clean up potential markdown fences if the AI includes them despite instructions
-      return response.reply.content.replace(/```[\w-]*\n/g, '').replace(/```\n/g, '').replace(/```/g, '').trim();
+        const response = await this.sendMessage(messages);
+        // Clean up potential markdown fences if the AI includes them despite instructions
+        return response.reply.content.replace(/```[\w-]*\n?/g, '').replace(/```/g, '').trim();
     } catch (error) {
-      console.error('Error in generateComponent:', error);
-      throw new Error(`Failed to generate component: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        console.error('Error in generateComponent:', error);
+        throw new Error(`Failed to generate component: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -395,35 +401,35 @@ class ApiService {
     const tests: { [key: string]: string } = {};
 
     for (const testType of testTypes) {
-      const messages: ApiMessage[] = [];
-      
-      const systemPrompts = {
-        unit: 'You are an expert test engineer. Generate Jest unit tests with comprehensive coverage, edge cases, and proper mocking. Return only the raw test code, without explanations or markdown.',
-        integration: 'You are an expert in integration testing. Generate Cypress tests for end-to-end workflows and UI interactions. Return only the raw test code, without explanations or markdown.',
-        api: 'You are an expert in API testing. Generate Supertest API tests for HTTP methods, status codes, and response validation. Return only the raw test code, without explanations or markdown.'
-      };
+        const messages: ApiMessage[] = [];
+        
+        const systemPrompts = {
+            unit: 'You are an expert test engineer. Generate Jest unit tests with comprehensive coverage, edge cases, and proper mocking. Return only the raw test code, without explanations or markdown.',
+            integration: 'You are an expert in integration testing. Generate Cypress tests for end-to-end workflows and UI interactions. Return only the raw test code, without explanations or markdown.',
+            api: 'You are an expert in API testing. Generate Supertest API tests for HTTP methods, status codes, and response validation. Return only the raw test code, without explanations or markdown.'
+        };
 
-      const userPrompts = {
-        unit: `Generate Jest unit tests for this code:\n\`\`\`\n${codeInput.substring(0, 2000)}\n\`\`\``,
-        integration: `Generate Cypress integration tests for this component/workflow:\n\`\`\`\n${codeInput.substring(0, 2000)}\n\`\`\``,
-        api: `Generate Supertest API tests for this Express.js route/controller code:\n\`\`\`\n${codeInput.substring(0, 2000)}\n\`\`\``
-      };
+        const userPrompts = {
+            unit: `Generate Jest unit tests for this code:\n\`\`\`\n${codeInput.substring(0, 2000)}\n\`\`\``,
+            integration: `Generate Cypress integration tests for this component/workflow:\n\`\`\`\n${codeInput.substring(0, 2000)}\n\`\`\``,
+            api: `Generate Supertest API tests for this Express.js route/controller code:\n\`\`\`\n${codeInput.substring(0, 2000)}\n\`\`\``
+        };
 
-      if (!systemPrompts[testType as keyof typeof systemPrompts]) continue;
+        if (!systemPrompts[testType as keyof typeof systemPrompts]) continue;
 
-      messages.push(
-        { role: 'system', content: systemPrompts[testType as keyof typeof systemPrompts] },
-        { role: 'user', content: userPrompts[testType as keyof typeof userPrompts] }
-      );
+        messages.push(
+            { role: 'system', content: systemPrompts[testType as keyof typeof systemPrompts] },
+            { role: 'user', content: userPrompts[testType as keyof typeof userPrompts] }
+        );
 
-      try {
-        const response = await this.sendMessage(messages);
-        // Clean up potential markdown fences
-        tests[testType] = response.reply.content.replace(/```[\w-]*\n/g, '').replace(/```\n/g, '').replace(/```/g, '').trim();
-      } catch (error) {
-        console.error(`Error generating ${testType} tests:`, error);
-        tests[testType] = `// Error generating ${testType} tests: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      }
+        try {
+            const response = await this.sendMessage(messages);
+            // Clean up potential markdown fences
+            tests[testType] = response.reply.content.replace(/```[\w-]*\n?/g, '').replace(/```/g, '').trim();
+        } catch (error) {
+            console.error(`Error generating ${testType} tests:`, error);
+            tests[testType] = `// Error generating ${testType} tests: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        }
     }
 
     return tests;
