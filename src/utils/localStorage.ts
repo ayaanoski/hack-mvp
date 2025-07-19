@@ -125,6 +125,69 @@ export const chatStorage = {
   },
 };
 
+export interface GeneratedComponent {
+  id: string;
+  description: string;
+  framework: string;
+  code: string;
+  preview?: string;
+  createdAt: string;
+}
+
+export interface GeneratedTests {
+  id: string;
+  codeInput: string;
+  testTypes: string[];
+  tests: {
+    unit?: string;
+    integration?: string;
+    api?: string;
+  };
+  createdAt: string;
+}
+
+export const generatorStorage = {
+  addComponent: (component: GeneratedComponent): void => {
+    const components = storage.get<GeneratedComponent[]>('hackmvp_generated_components') || [];
+    components.push(component);
+    storage.set('hackmvp_generated_components', components);
+  },
+
+  getComponents: (): GeneratedComponent[] => {
+    return storage.get<GeneratedComponent[]>('hackmvp_generated_components') || [];
+  },
+
+  addTest: (test: GeneratedTests): void => {
+    const tests = storage.get<GeneratedTests[]>('hackmvp_generated_tests') || [];
+    tests.push(test);
+    storage.set('hackmvp_generated_tests', tests);
+  },
+
+  getTests: (): GeneratedTests[] => {
+    return storage.get<GeneratedTests[]>('hackmvp_generated_tests') || [];
+  },
+
+  deleteComponent: (id: string): boolean => {
+    const components = generatorStorage.getComponents();
+    const filtered = components.filter(c => c.id !== id);
+    if (filtered.length !== components.length) {
+      storage.set('hackmvp_generated_components', filtered);
+      return true;
+    }
+    return false;
+  },
+
+  deleteTest: (id: string): boolean => {
+    const tests = generatorStorage.getTests();
+    const filtered = tests.filter(t => t.id !== id);
+    if (filtered.length !== tests.length) {
+      storage.set('hackmvp_generated_tests', filtered);
+      return true;
+    }
+    return false;
+  },
+};
+
 export const checklistStorage = {
   getAll: (): ChecklistItem[] => storage.get<ChecklistItem[]>(LOCAL_STORAGE_KEYS.CHECKLISTS) || [],
   

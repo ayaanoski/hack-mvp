@@ -1,63 +1,71 @@
 import React from 'react';
-import { Lightbulb, MessageSquare, Presentation as PresentationChart, Layers, Palette,  RotateCcw, FileText, BookOpen } from 'lucide-react';
+import { 
+  Lightbulb, 
+  MessageSquare, 
+  Presentation, 
+  Video, 
+  Package, 
+  CheckSquare, 
+  LayoutTemplate, // For Component Generator
+  FlaskConical   // For Test Case Generator
+} from 'lucide-react';
 
 const features = [
   {
     icon: Lightbulb,
-    title: 'Idea Refinement',
-    description: 'Transform vague concepts into well-defined project requirements with AI guidance.',
+    title: 'Idea Refiner',
+    description: 'Transform your raw idea into a structured and viable project concept with AI-driven feedback and validation.',
     color: 'text-neon-purple',
     bgColor: 'bg-neon-purple/20',
   },
   {
     icon: MessageSquare,
-    title: 'Prompt Generator',
-    description: 'Generate optimized prompts for website builders and development tools.',
+    title: 'Prompt Builder',
+    description: 'Intuitively construct powerful and effective prompts to guide the AI in generating your desired outputs.',
     color: 'text-neon-blue',
     bgColor: 'bg-neon-blue/20',
   },
   {
-    icon: PresentationChart,
-    title: 'AI-Powered Pitch Copy',
-    description: 'Create compelling pitch decks and presentations that win hackathons.',
+    icon: Presentation,
+    title: 'Pitch Deck Generator',
+    description: 'Automatically create a compelling and professional pitch deck from your project details in just a few clicks.',
     color: 'text-neon-green',
     bgColor: 'bg-neon-green/20',
   },
   {
-    icon: Layers,
-    title: 'Tech Stack Recommender',
-    description: 'Get personalized technology recommendations based on your project needs.',
+    icon: Video,
+    title: 'Video Script Generator',
+    description: 'Instantly generate engaging video scripts to create a memorable demo or promotional video for your project.',
     color: 'text-neon-purple',
     bgColor: 'bg-neon-purple/20',
   },
   {
-    icon: Palette,
-    title: 'UI Mockup Suggestions',
-    description: 'Receive design inspiration and UI mockups tailored to your project.',
-    color: 'text-neon-blue',
-    bgColor: 'bg-neon-blue/20',
-  },
-  
-  {
-    icon: RotateCcw,
-    title: 'Iterative Regeneration',
-    description: 'Continuously improve your MVP with AI-powered iterations and feedback.',
+    icon: Package,
+    title: 'MVP Kit',
+    description: 'Bundle all your generated assets—from code to documentation—into a single, ready-to-deploy MVP package.',
     color: 'text-neon-blue',
     bgColor: 'bg-neon-blue/20',
   },
   {
-    icon: FileText,
-    title: 'Hackathon Templates',
-    description: 'Access pre-built templates for common hackathon themes and challenges.',
+    icon: CheckSquare,
+    title: 'Smart Checklist',
+    description: 'Stay organized and on track with an intelligent, auto-generated checklist tailored to your project’s specific needs.',
     color: 'text-neon-green',
     bgColor: 'bg-neon-green/20',
   },
   {
-    icon: BookOpen,
-    title: 'Auto-Generated Docs',
-    description: 'Generate comprehensive documentation and README files automatically.',
+    icon: LayoutTemplate,
+    title: 'AI Component Generator',
+    description: 'Describe any UI element in natural language and receive production-ready code for React, Flutter, and more.',
     color: 'text-neon-purple',
     bgColor: 'bg-neon-purple/20',
+  },
+  {
+    icon: FlaskConical,
+    title: 'Automated Test Generator',
+    description: 'Generate unit, integration, and API tests from your codebase to ensure a robust and reliable application.',
+    color: 'text-neon-blue',
+    bgColor: 'bg-neon-blue/20',
   },
 ];
 
@@ -69,15 +77,15 @@ export const FeaturesSection: React.FC = () => {
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
             Powerful Features for{' '}
             <span className="bg-gradient-to-r from-purple-glow to-neon-blue bg-clip-text text-transparent">
-              Hackathon Success
+              Rapid MVP Development
             </span>
           </h2>
           <p className="text-sm sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
-            Everything you need to transform your hackathon idea into a winning MVP, powered by advanced AI agents.
+            Everything you need to transform your idea into a winning MVP, powered by a suite of intelligent AI agents.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {features.map((feature, index) => (
             <div
               key={index}

@@ -56,7 +56,7 @@ export const ChecklistPage: React.FC = () => {
   const selectedChecklistData = checklists.find(c => c.id === selectedChecklist);
 
   return (
-    <div className="min-h-screen bg-dark-bg pt-16 sm:pt-20">
+    <div className="min-h-screen bg-transparent pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-4 sm:py-8">
           <div className="text-center mb-6 sm:mb-8">
@@ -172,26 +172,39 @@ export const ChecklistPage: React.FC = () => {
                     <div className="space-y-4">
                       {selectedChecklistData.checklist.categories.map((category: any, categoryIndex: number) => (
                         <div key={categoryIndex} className="bg-dark-bg border border-dark-border rounded-lg p-4">
-                          <h4 className="text-base sm:text-lg font-bold text-white mb-3">{category.name}</h4>
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-base sm:text-lg font-bold text-white">{category.name}</h4>
+                            <div className="text-sm text-gray-400">
+                              {category.items.filter((item: any) => item.completed).length}/{category.items.length} completed
+                            </div>
+                          </div>
                           <div className="space-y-3">
                             {category.items.map((item: any, itemIndex: number) => (
                               <div key={itemIndex} className="flex items-start space-x-3">
                                 <button
                                   onClick={() => toggleChecklistItem(selectedChecklistData.id, categoryIndex, itemIndex)}
-                                  className={`w-5 h-5 border-2 rounded flex items-center justify-center mt-0.5 flex-shrink-0 transition-colors ${
+                                  className={`w-5 h-5 border-2 rounded flex items-center justify-center mt-0.5 flex-shrink-0 transition-all duration-200 hover:scale-110 ${
                                     item.completed 
-                                      ? 'bg-neon-green border-neon-green' 
-                                      : 'border-gray-500 hover:border-neon-green'
+                                      ? 'bg-neon-green border-neon-green shadow-lg shadow-neon-green/50' 
+                                      : 'border-gray-500 hover:border-neon-green hover:bg-neon-green/10'
                                   }`}
                                 >
-                                  {item.completed && <Check className="h-3 w-3 text-white" />}
+                                  {item.completed && <Check className="h-3 w-3 text-white animate-pulse" />}
                                 </button>
                                 <div className="flex-1">
-                                  <p className={`text-sm ${item.completed ? 'text-gray-500 line-through' : 'text-gray-300'}`}>
+                                  <p className={`text-sm transition-all duration-200 ${
+                                    item.completed 
+                                      ? 'text-gray-500 line-through opacity-75' 
+                                      : 'text-gray-300 hover:text-white'
+                                  }`}>
                                     {item.task}
                                   </p>
                                   {item.description && (
-                                    <p className="text-gray-500 text-xs mt-1">{item.description}</p>
+                                    <p className={`text-xs mt-1 transition-all duration-200 ${
+                                      item.completed ? 'text-gray-600' : 'text-gray-500'
+                                    }`}>
+                                      {item.description}
+                                    </p>
                                   )}
                                 </div>
                               </div>
@@ -210,9 +223,19 @@ export const ChecklistPage: React.FC = () => {
               ) : (
                 <div className="bg-dark-card border border-dark-border rounded-lg p-4 sm:p-6">
                   <div className="text-center py-12">
-                    <CheckSquare className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-white mb-2">Select a Checklist</h3>
-                    <p className="text-gray-400">Choose a checklist from the left to view and manage its items.</p>
+                    <div className="relative">
+                      <CheckSquare className="h-16 w-16 text-gray-600 mx-auto mb-4 animate-pulse" />
+                      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-neon-green/20 rounded-full animate-ping"></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">Select a Checklist</h3>
+                    <p className="text-gray-400 mb-4">Choose a checklist from the left to view and manage its items.</p>
+                    {checklists.length === 0 && (
+                      <div className="mt-6 p-4 bg-dark-bg border border-dark-border rounded-lg">
+                        <p className="text-gray-500 text-sm">
+                          No checklists available. Generate one from the Dashboard workflow to get started.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

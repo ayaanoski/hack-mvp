@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SEOHead } from '../common/SEOHead';
 import { Lightbulb, MessageSquare, Package, ArrowRight, Presentation, Video, CheckSquare } from 'lucide-react';
 import { IdeaRefiner } from './IdeaRefiner';
 import { PromptBuilder } from './PromptBuilder';
@@ -82,6 +83,11 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen pt-12 sm:pt-14 md:pt-16">
+      <SEOHead 
+        title="Dashboard - HackMVP | AI-Powered MVP Generator"
+        description="Use HackMVP's AI-powered dashboard to refine ideas, generate prompts, create pitch decks, and build complete MVP kits for your hackathon projects."
+        keywords="MVP dashboard, AI tools, hackathon dashboard, idea refinement, prompt generator, pitch deck creator"
+      />
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="py-3 sm:py-6 md:py-8">
           <div className="text-center mb-4 sm:mb-6 md:mb-8">
@@ -94,30 +100,30 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Progress Steps */}
-          <div className="mb-4 sm:mb-6 md:mb-8">
-            <div className="flex items-center justify-center space-x-1 sm:space-x-2 md:space-x-4 flex-wrap gap-y-2 px-2">
-              {steps.map((step, index) => (
-                <React.Fragment key={step.id}>
-                  <button
-                    onClick={() => goToStep(index)}
-                    className={`flex items-center space-x-1 sm:space-x-2 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg whitespace-nowrap transition-all duration-300 hover:scale-105 ${
-                    index === currentStep
-                      ? 'bg-purple-glow text-white shadow-lg shadow-purple-glow/50'
-                      : index < currentStep
-                      ? 'bg-neon-green text-white shadow-lg shadow-neon-green/50'
-                      : 'bg-dark-card text-gray-400 hover:bg-dark-border'
-                  }`}
-                  >
-                    <step.icon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm hidden sm:inline">{step.label}</span>
-                  </button>
-                  {index < steps.length - 1 && (
-                    <ArrowRight className="text-gray-500 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 flex-shrink-0 hidden sm:block" />
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
+          <div className="mb-4 md:mb-6">
+  <div className="flex items-center justify-center space-x-2 md:space-x-3">
+    {steps.map((step, index) => (
+      <React.Fragment key={step.id}>
+        <button
+          onClick={() => goToStep(index)}
+          className={`flex items-center space-x-1.5 rounded-md px-2 py-1 transition-all duration-300 hover:scale-105 ${
+            index === currentStep
+              ? 'bg-purple-glow text-white shadow-md shadow-purple-glow/40'
+              : index < currentStep
+              ? 'bg-neon-green text-white shadow-md shadow-neon-green/40'
+              : 'bg-dark-card text-gray-400 hover:bg-dark-border'
+          }`}
+        >
+          <step.icon className="h-4 w-4 flex-shrink-0" />
+          <span className="text-xs hidden sm:inline">{step.label}</span>
+        </button>
+        {index < steps.length - 1 && (
+          <ArrowRight className="text-gray-600 h-4 w-4 flex-shrink-0 hidden sm:block" />
+        )}
+      </React.Fragment>
+    ))}
+  </div>
+</div>
 
           {/* Step Content */}
           <div className="mb-3 sm:mb-6 md:mb-8">

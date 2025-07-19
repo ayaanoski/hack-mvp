@@ -1,35 +1,41 @@
 import React from 'react';
-import { ArrowRight, Lightbulb, Cog, Package, Share2 } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Lightbulb, 
+  Sparkles, // For Generate
+  FlaskConical,  // For Validate
+  Package         // For Package
+} from 'lucide-react';
 
 const steps = [
   {
     icon: Lightbulb,
-    title: 'Input Your Idea',
-    description: 'Share your rough concept or problem statement with our AI agent.',
+    title: '1. Define & Refine',
+    description: 'Use the Idea Refiner and Prompt Builder to transform your concept into a detailed, AI-ready project plan.',
     color: 'text-neon-purple',
     bgColor: 'bg-neon-purple/20',
     borderColor: 'border-neon-purple/30',
   },
   {
-    icon: Cog,
-    title: 'AI Refinement',
-    description: 'Our agents analyze, refine, and structure your idea into actionable requirements.',
+    icon: Sparkles,
+    title: '2. Generate Assets',
+    description: 'Describe what you need and let AI generate UI components, pitch decks, video scripts, and more.',
     color: 'text-neon-blue',
     bgColor: 'bg-neon-blue/20',
     borderColor: 'border-neon-blue/30',
   },
   {
-    icon: Package,
-    title: 'MVP Generation',
-    description: 'Generate tech stack, UI mockups, code structure, and pitch deck automatically.',
+    icon: FlaskConical,
+    title: '3. Validate & Test',
+    description: 'Automatically generate unit, integration, and API tests to ensure your generated code is robust and reliable.',
     color: 'text-neon-green',
     bgColor: 'bg-neon-green/20',
     borderColor: 'border-neon-green/30',
   },
   {
-    icon: Share2,
-    title: 'Deploy & Share',
-    description: 'One-click deployment and instant sharing with your team and judges.',
+    icon: Package,
+    title: '4. Package & Go',
+    description: 'Bundle all your assets into a complete MVP Kit and use the smart checklist to finalize your project for submission.',
     color: 'text-yellow-400',
     bgColor: 'bg-yellow-400/20',
     borderColor: 'border-yellow-400/30',
@@ -45,7 +51,7 @@ export const HowItWorksSection: React.FC = () => {
             How It Works
           </h2>
           <p className="text-sm sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
-            From concept to deployment in four simple steps. Our AI agents handle the complex work while you focus on innovation.
+            From concept to completion in four simple stages. Our AI agents handle the complex work while you focus on innovation.
           </p>
         </div>
 
@@ -66,7 +72,7 @@ export const HowItWorksSection: React.FC = () => {
                   </p>
                 </div>
                 {index < steps.length - 1 && (
-                  <ArrowRight className="text-gray-500 h-4 w-4 md:h-6 md:w-6 flex-shrink-0" />
+                  <ArrowRight className="text-gray-500 h-4 w-4 md:h-6 md:w-6 flex-shrink-0 mx-4" />
                 )}
               </React.Fragment>
             ))}
@@ -99,7 +105,7 @@ export const HowItWorksSection: React.FC = () => {
               See It In Action
             </h3>
             <p className="text-gray-400 text-xs sm:text-sm md:text-base">
-              Watch how HackMVP transforms a simple idea into a complete MVP kit.
+              Watch how HackMVP transforms a simple prompt into a complete, tested MVP.
             </p>
           </div>
           
@@ -110,14 +116,16 @@ export const HowItWorksSection: React.FC = () => {
               <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 bg-green-500 rounded-full"></div>
             </div>
             
-            <div className="text-green-400 text-xs sm:text-sm md:text-base overflow-x-auto">
-              <div className="mb-1 sm:mb-2">$ hackmvp generate "A social app for finding study partners"</div>
-              <div className="text-gray-500 mb-1 sm:mb-2">🤖 Analyzing your idea...</div>
-              <div className="text-gray-500 mb-1 sm:mb-2">🔍 Refining requirements...</div>
-              <div className="text-gray-500 mb-1 sm:mb-2">⚡ Generating tech stack...</div>
-              <div className="text-gray-500 mb-1 sm:mb-2">🎨 Creating UI mockups...</div>
-              <div className="text-gray-500 mb-1 sm:mb-2">📝 Writing pitch copy...</div>
-              <div className="text-neon-green">✅ Your MVP kit is ready!</div>
+            <div className="font-mono text-gray-300 text-xs sm:text-sm md:text-base overflow-x-auto">
+              <div className="mb-1 sm:mb-2"><span className="text-green-400">$ hackmvp build</span> "A social app for finding study partners"</div>
+              <div className="text-gray-500 mb-1 sm:mb-2">▶ Refining idea...</div>
+              <div className="text-gray-500 mb-1 sm:mb-2">▶ Generating UI components (React + Tailwind)...</div>
+              <div className="text-gray-500 mb-1 sm:mb-2">▶ Crafting pitch deck...</div>
+              <div className="text-gray-500 mb-1 sm:mb-2">▶ Writing video script...</div>
+              <div className="text-gray-500 mb-1 sm:mb-2">▶ Creating test cases (Jest + Cypress)...</div>
+              <div className="text-gray-500 mb-1 sm:mb-2">▶ Building final checklist...</div>
+              <div className="text-gray-500 mb-1 sm:mb-2">▶ Assembling your MVP Kit...</div>
+              <div className="text-neon-green mt-2">✅ MVP build complete!</div>
             </div>
           </div>
         </div>

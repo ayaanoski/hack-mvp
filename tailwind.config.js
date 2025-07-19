@@ -3,10 +3,13 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      // Merged font families
       fontFamily: {
         'mono': ['Rubik Mono One', 'monospace'],
         'silkscreen': ['Silkscreen', 'monospace'],
       },
+
+      // Merged colors
       colors: {
         'neon-purple': '#8B5CF6',
         'neon-blue': '#6366F1',
@@ -16,6 +19,8 @@ export default {
         'dark-border': '#1A1A1A',
         'purple-glow': '#7C3AED',
       },
+
+      // Merged animations
       animation: {
         'glow': 'glow 2s ease-in-out infinite alternate',
         'float': 'float 3s ease-in-out infinite',
@@ -28,7 +33,10 @@ export default {
         'move-horizontal-1': 'moveHorizontal1 25s linear infinite',
         'move-horizontal-2': 'moveHorizontal2 30s linear infinite',
         'move-vertical-1': 'moveVertical1 22s linear infinite',
+        'fade-in-down': 'fade-in-down 0.3s ease-out forwards', // Added from the second snippet
       },
+
+      // Merged keyframes
       keyframes: {
         glow: {
           '0%': { boxShadow: '0 0 20px #7C3AED' },
@@ -61,6 +69,16 @@ export default {
         moveVertical1: {
           '0%': { transform: 'translateY(-100vh)' },
           '100%': { transform: 'translateY(100vh)' },
+        },
+        'fade-in-down': { // Added from the second snippet
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px) scale(0.95)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0) scale(1)',
+          },
         },
       },
     },

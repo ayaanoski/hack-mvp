@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import {  useNavigate } from 'react-router-dom';
-import { ArrowRight} from 'lucide-react';
+import React, { useState,  useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const CTASection: React.FC = () => {
@@ -8,10 +8,21 @@ export const CTASection: React.FC = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { current: container } = containerRef;
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      container.style.setProperty('--mouse-x', `${x}px`);
+      container.style.setProperty('--mouse-y', `${y}px`);
+    }
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd send this to your backend
     console.log('Subscribed:', email);
     setIsSubscribed(true);
     setEmail('');
@@ -26,62 +37,71 @@ export const CTASection: React.FC = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 md:py-24 relative">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
+    <section
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative py-16 sm:py-20 md:py-28 overflow-hidden group"
+    >
+      <div
+        className="pointer-events-none absolute -inset-px transition-all duration-300"
+        style={{
+          background: `radial-gradient(400px at var(--mouse-x, 100px) var(--mouse-y, 100px), rgba(147, 51, 234, 0.1), transparent 80%)`,
+        }}
+      ></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-10 sm:mb-14 md:mb-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6">
             Ready to Build Your{' '}
-            <span className="bg-gradient-to-r from-purple-glow to-neon-blue bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-transparent">
               Next MVP?
             </span>
           </h2>
-          <p className="text-sm sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-4 sm:mb-6 md:mb-8">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-6 sm:mb-8 md:mb-10">
             Join thousands of developers who are already using HackMVP to win hackathons and build amazing products.
           </p>
           
           <button
             onClick={handleStartBuilding}
-            className="inline-flex items-center px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 bg-gradient-to-r from-purple-glow to-neon-blue hover:from-purple-600 hover:to-blue-600 text-white text-sm sm:text-base md:text-lg rounded-lg transition-all duration-300 transform hover:scale-105 animate-glow"
+            className="inline-flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-base sm:text-lg md:text-xl font-semibold rounded-full shadow-lg hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 ease-in-out ring-2 ring-purple-500/50 ring-offset-4 ring-offset-gray-900"
           >
             {currentUser ? 'Continue Building' : 'Start Building Now'}
-            <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+            <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
           </button>
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="bg-dark-card/80 backdrop-blur-sm border border-dark-border rounded-lg p-4 sm:p-6 md:p-8 mb-8 sm:mb-12 md:mb-16 max-w-2xl mx-auto">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-3 sm:mb-4 text-center">
+        <div className="bg-gray-900/50 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 sm:p-8 md:p-10 max-w-2xl mx-auto shadow-2xl">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 text-center">
             Stay Updated
           </h3>
-          <p className="text-gray-400 text-center mb-4 sm:mb-6 text-xs sm:text-sm md:text-base">
+          <p className="text-gray-400 text-center mb-6 sm:mb-8 text-sm sm:text-base">
             Get notified about new features, hackathon templates, and success stories.
           </p>
           
           {!isSubscribed ? (
-            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-dark-bg border border-dark-border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-glow text-xs sm:text-sm md:text-base"
+                placeholder="your.email@example.com"
+                className="flex-grow px-4 py-3 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 text-sm sm:text-base"
                 required
               />
               <button
                 type="submit"
-                className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-purple-glow hover:bg-purple-600 text-white rounded-lg transition-colors text-xs sm:text-sm md:text-base"
+                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-full transition-colors duration-300 text-sm sm:text-base"
               >
                 Subscribe
               </button>
             </form>
           ) : (
-            <div className="text-center text-neon-green text-xs sm:text-sm md:text-base">
-              ✅ Thanks for subscribing! We'll keep you updated.
+            <div className="text-center text-green-400 flex items-center justify-center animate-fade-in-up">
+              <CheckCircle className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="text-sm sm:text-base">Thanks for subscribing! We'll keep you updated.</span>
             </div>
           )}
         </div>
-
-      
       </div>
     </section>
   );

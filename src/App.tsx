@@ -10,6 +10,8 @@ import { LandingPage } from './pages/LandingPage';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { HistoryPage } from './pages/HistoryPage';
 import { ChecklistPage } from './pages/ChecklistPage';
+import { GeneratorPage } from './pages/GeneratorPage';
+import { ProfilePage } from './components/profile/ProfilePage';
 
 function App() {
   return (
@@ -36,6 +38,16 @@ function App() {
             <Route path="/checklist" element={
               <ProtectedRoute>
                 <ChecklistPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/generators" element={
+              <ProtectedRoute>
+                <GeneratorPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             } />
           </Routes>

@@ -56,7 +56,7 @@ export const HeroSection: React.FC = () => {
           <div className="mt-8 sm:mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
             {[
               { icon: Zap, value: '10x', label: 'Faster Creation' },
-              { icon: Sparkles, value: '500+', label: 'Hackathon Teams' },
+              { icon: Sparkles, value: '#1', label: 'One Stop Solution' },
               { icon: ArrowRight, value: '95%', label: 'Success Rate' },
             ].map((stat, index) => (
               <div key={index} className="text-center">
