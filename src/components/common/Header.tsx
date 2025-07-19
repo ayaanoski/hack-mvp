@@ -40,20 +40,12 @@ export const Header: React.FC = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-xl border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 md:h-20">
-          
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
-            <img
-              src="/logo.png"
-              alt="HackMVP Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 transition-transform duration-300 group-hover:rotate-12"
-            />
-            <span className="text-xl md:text-2xl font-bold text-white tracking-wide">
-              HackMVP
-            </span>
+    <header className="bg-dark-bg/90 border-b border-dark-border fixed w-full z-50 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex justify-between items-center h-12 sm:h-14 md:h-16">
+          <Link to="/" className="flex items-center space-x-2">
+            <Zap className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-purple-glow animate-pulse" />
+            <span className="text-sm sm:text-lg md:text-xl font-bold text-white">HackMVP</span>
           </Link>
 
           {/* Navigation & User Actions */}
